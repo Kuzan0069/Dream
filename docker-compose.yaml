@@ -27,12 +27,15 @@ services:
 
 
   frontend:
-    image: kuzan0069/frontend:latest
-    container_name: frontend
-    depends_on:
-      - backend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_API_URL: http://backend:3001
     ports:
       - "80:80"
+    depends_on:
+      - backend
 
 volumes:
   mysql_data:
