@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://backend:3001';
+const API_URL = '/api'; // ✅ This lets Nginx forward requests properly
 
 function App() {
   const [destinations, setDestinations] = useState([]);
@@ -13,7 +13,7 @@ function App() {
 
   const fetchDestinations = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/destinations`);
+      const response = await axios.get(`${API_URL}/destinations`);
       setDestinations(response.data);
     } catch (error) {
       console.error('Error fetching destinations:', error);
@@ -23,7 +23,7 @@ function App() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${API_URL}/api/destinations`, { country });
+      await axios.post(`${API_URL}/destinations`, { country });
       setCountry('');
       fetchDestinations();
     } catch (error) {
@@ -33,7 +33,7 @@ function App() {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${API_URL}/api/destinations/${id}`);
+      await axios.delete(`${API_URL}/destinations/${id}`);
       fetchDestinations();
     } catch (error) {
       console.error('Error deleting destination:', error);
