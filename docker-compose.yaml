@@ -14,17 +14,29 @@ services:
       - mysql_data:/var/lib/mysql
     ports:
       - "3306:3306"
+    networks:
+      - dream_net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uadmin", "-p1234"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   backend:
-    image: kuzan0069/backend:latest
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     container_name: backend
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     env_file:
       - ./backend/.env
     ports:
       - "3001:3001"
-
+    networks:
+      - dream_net
 
   frontend:
     build:
@@ -34,6 +46,12 @@ services:
       - "80:80"
     depends_on:
       - backend
+    networks:
+      - dream_net
 
 volumes:
   mysql_data:
+
+networks:
+  dream_net:
+    driver: bridge
