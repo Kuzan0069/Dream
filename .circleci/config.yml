@@ -1,0 +1,32 @@
+version: 2.1
+
+executors:
+  docker-executor:
+    docker:
+      - image: cimg/base:stable
+
+jobs:
+  deploy:
+    executor: docker-executor
+    steps:
+      - checkout
+
+      - add_ssh_keys:
+          fingerprints:
+            - "xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx"  # Replace with your SSH key fingerprint
+
+      - run:
+          name: Build and Deploy on EC2
+          command: |
+            ssh -o StrictHostKeyChecking=no $EC2_HOST << 'EOF'
+              cd ~/Dream  # or your actual project folder
+              git pull origin main
+              docker compose down --remove-orphans
+              docker compose build
+              docker compose up -d
+            EOF
+
+workflows:
+  deploy-workflow:
+    jobs:
+      - deploy

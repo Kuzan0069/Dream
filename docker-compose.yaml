@@ -24,7 +24,9 @@ services:
       start_period: 10s
 
   backend:
-    image: kuzan0069/dream-backend:latest
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     container_name: backend
     depends_on:
       mysql:
@@ -37,7 +39,9 @@ services:
       - dream_net
 
   frontend:
-    image: kuzan0069/dream-frontend:latest
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     ports:
       - "80:80"
     depends_on:
