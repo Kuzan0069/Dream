@@ -13,12 +13,12 @@ jobs:
 
       - add_ssh_keys:
           fingerprints:
-            - "xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx"  # Replace with your SSH key fingerprint
+            - "SHA256:Z4A+Ef7DJZ3N5AtxlC9ISZK/wS6owpq10wDCPtxhTyw"  # Replace with your SSH key fingerprint
 
       - run:
           name: Build and Deploy on EC2
           command: |
-            ssh -o StrictHostKeyChecking=no $EC2_HOST << 'EOF'
+            ssh -o StrictHostKeyChecking=no $EC2_HOST \<< 'EOF'
               cd ~/Dream  # or your actual project folder
               git pull origin main
               docker compose down --remove-orphans
