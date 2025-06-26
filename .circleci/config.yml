@@ -6,29 +6,57 @@ executors:
       - image: cimg/base:stable
 
 jobs:
-  deploy:
+  build-frontend:
     executor: docker-executor
-    environment:
-      EC2_HOST: "ec2-user@51.21.222.5"
     steps:
       - checkout
-
+      - run:
+          name: Build and Push Frontend Docker Image
+          command: |
+            docker build -t kuzan0069/dream-frontend ./frontend
+            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+            docker push kuzan0069/dream-frontend
       - add_ssh_keys:
           fingerprints:
-            - "SHA256:Z4A+Ef7DJZ3N5AtxlC9ISZK/wS6owpq10wDCPtxhTyw"  # Replace with your SSH key fingerprint
-
+            - "SHA256:Z4A+Ef7DJZ3N5AtxlC9ISZK/wS6owpq10wDCPtxhTyw"
       - run:
-          name: Build and Deploy on EC2
+          name: Deploy Frontend on EC2
           command: |
             ssh -o StrictHostKeyChecking=no $EC2_HOST \<< 'EOF'
-              cd ~/Dream  # or your actual project folder
-              git pull origin main
-              docker compose down --remove-orphans
-              docker compose build
-              docker compose up -d
+              docker pull kuzan0069/dream-frontend
+              docker compose up -d --no-deps frontend
+            EOF
+
+  build-backend:
+    executor: docker-executor
+    steps:
+      - checkout
+      - run:
+          name: Build and Push Backend Docker Image
+          command: |
+            docker build -t kuzan0069/dream-backend ./backend
+            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+            docker push kuzan0069/dream-backend
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:Z4A+Ef7DJZ3N5AtxlC9ISZK/wS6owpq10wDCPtxhTyw"
+      - run:
+          name: Deploy Backend on EC2
+          command: |
+            ssh -o StrictHostKeyChecking=no $EC2_HOST \<< 'EOF'
+              docker pull kuzan0069/dream-backend
+              docker compose up -d --no-deps backend
             EOF
 
 workflows:
+  version: 2.1
   deploy-workflow:
     jobs:
-      - deploy
+      - build-frontend:
+          filters:
+            paths:
+              - "frontend/**"
+      - build-backend:
+          filters:
+            paths:
+              - "backend/**"
