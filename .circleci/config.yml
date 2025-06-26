@@ -4,10 +4,14 @@ executors:
   docker-executor:
     docker:
       - image: cimg/base:stable
+environment:
+      EC2_HOST: "ec2-user@your-ec2-public-ip"
 
 jobs:
   deploy:
     executor: docker-executor
+    environment:
+      EC2_HOST: "ec2-user@51.21.222.5"
     steps:
       - checkout
 
