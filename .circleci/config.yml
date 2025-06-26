@@ -11,7 +11,7 @@ executors:
 
 jobs:
   build-frontend:
-    executor: docker-executor
+    machine: true
     steps:
       - checkout
       - run:
@@ -32,7 +32,7 @@ jobs:
             EOF
 
   build-backend:
-    executor: docker-executor
+    machine: true
     steps:
       - checkout
       - run:
