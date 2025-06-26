@@ -1,8 +1,5 @@
 version: 2.1
 
-orbs:
-  path-filtering: circleci/path-filtering@0.1.1
-
 executors:
   docker-executor:
     docker:
@@ -52,12 +49,15 @@ jobs:
             EOF
 
 workflows:
-  version: 2
-  deploy-workflow:
+  deploy-changed-services:
     jobs:
-      - path-filtering/filter:
-          base-revision: main
-          config-path: .circleci/workflows/filtered-config.yml
-          mapping: |
-            frontend/.* build-frontend true
-            backend/.* build-backend true
+      - build-frontend:
+          filters:
+            branches:
+              only:
+                - main
+      - build-backend:
+          filters:
+            branches:
+              only:
+                - main
